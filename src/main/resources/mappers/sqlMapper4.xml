@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+   <!DOCTYPE mapper
+     PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+     "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.spring.mvc_mybatis.ch04.dao.UserDAO_ch04">
+	<sql id="selectUser">
+		SELECT user_id,
+		user_name,
+		reg_date
+		FROM mvc_user_tbl
+	</sql>
+
+	<resultMap id="userMap"
+		type="com.spring.mvc_mybatis.ch04.dto.UserDTO_4">
+		<id property="userId" column="user_id" />
+		<result property="userName" column="user_name" />
+		<result property="regDate" column="reg_date" />
+	</resultMap>
+
+	<select id="getUserInfo1"
+		parameterType="com.spring.mvc_mybatis.ch04.dto.SearchDTO_4"
+		resultMap="userMap">
+
+		<include refid="selectUser" />
+		<!-- //방법 1 where user id in (1,2)검색 -->
+		<!--WHERE user_id IN (1,2) -->
+		<where>
+			<if test="userIds != null">
+				user_id IN
+				<foreach item="userId" collection="userIds" open="("
+					separator="," close=")">
+					#{userId} <!-- item="속성명"과 #{속성명} 단 속성명은 자유롭게 줘도 된다. -->
+				</foreach>
+			</if>
+			<!-- //방법 2 where user_name in (john, smith) 검색 -->
+			<if test="userNames != null">
+				user_name IN
+				<foreach item="userName" collection="userNames" open="(" separator="," close=")">
+					#{userName} <!-- item="속성명"과 #{속성명} 단 속성명은 자유롭게 줘도 된다. -->
+				</foreach>
+			</if>
+
+
+		</where>
+	</select>
+
+	<select id="getUserInfo2" resultMap="userMap">
+    <include refid="selectUser" />
+    <where>
+        user_id IN
+        <foreach item="userId" collection="array" open="(" separator="," close=")">
+            #{userId}
+        </foreach>
+    </where>
+</select>
+	<select id="getUserInfo3" resultMap="userMap">
+		<include refid="selectUser" />
+		<where>
+			user_name IN
+			<foreach item="userName" collection="list" open="(" separator="," close=")">
+				#{userName} <!-- item="속성명"과 #{속성명} 단 속성명은 자유롭게 줘도 된다. -->
+			</foreach>
+		</where>
+	</select>
+
+
+</mapper> 
